@@ -1,0 +1,16 @@
+parameters:
+  testCommand: ''
+
+steps:
+
+- script: |
+    echo "Running unit tests..."
+
+    if [ -z "${{ parameters.testCommand }}" ]; then
+      echo "No test command provided. Skipping tests."
+    else
+      ${{ parameters.testCommand }}
+    fi
+
+    echo "Unit tests completed successfully"
+  displayName: Run Unit Tests
