@@ -1,0 +1,39 @@
+parameters:
+  imageTag: ''
+  manifestsPath: 'kubernetes'
+  gitUserName: 'Azure DevOps CI'
+  gitUserEmail: 'azuredevops@example.com'
+
+steps:
+
+- script: |
+    echo "Updating Kubernetes manifests with image tag: ${{ parameters.imageTag }}"
+
+    # Configure Git
+    git config user.name "${{ parameters.gitUserName }}"
+    git config user.email "${{ parameters.gitUserEmail }}"
+
+    # Update deployment image
+    sed -i "s|image: trainwithshubham/easyshop-app:.*|image: trainwithshubham/easyshop-app:${{ parameters.imageTag }}|g" ${{ parameters.manifestsPath }}/08-easyshop-deployment.yaml
+
+    # Update migration job if exists
+    if [ -f "${{ parameters.manifestsPath }}/12-migration-job.yaml" ]; then
+      sed -i "s|image: trainwithshubham/easyshop-migration:.*|image: trainwithshubham/easyshop-migration:${{ parameters.imageTag }}|g" ${{ parameters.manifestsPath }}/12-migration-job.yaml
+    fi
+
+    # Update ingress domain
+    if [ -f "${{ parameters.manifestsPath }}/10-ingress.yaml" ]; then
+      sed -i "s|host: .*|host: easyshop.letsdeployit.com|g" ${{ parameters.manifestsPath }}/10-ingress.yaml
+    fi
+
+    # Check for changes
+    if git diff --quiet; then
+      echo "No changes to commit"
+    else
+      git add ${{ parameters.manifestsPath }}/*.yaml
+      git commit -m "Update image tag to ${{ parameters.imageTag }} [ci skip]"
+
+      # Push using System Access Token
+      git push origin HEAD:$(Build.SourceBranchName)
+    fi
+  displayName: Update Kubernetes Manifests
