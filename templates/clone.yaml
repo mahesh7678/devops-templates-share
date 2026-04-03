@@ -1,0 +1,8 @@
+parameters:
+  repoUrl: ''
+  branch: 'main'
+
+steps:
+
+- checkout: git:///${{ parameters.repoUrl }}
+  displayName: Checkout Repository
