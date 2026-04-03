@@ -1,0 +1,28 @@
+parameters:
+  projectName: 'Project'
+  imageName: ''
+  imageTag: ''
+
+steps:
+
+- script: |
+    echo "Generating build report..."
+
+    mkdir -p reports
+
+    echo "===== ${{ parameters.projectName }} Build Report =====" > reports/build-report.txt
+    echo "Generated: $(date)" >> reports/build-report.txt
+    echo "" >> reports/build-report.txt
+    echo "Build Number: $(Build.BuildId)" >> reports/build-report.txt
+    echo "Docker Images: ${{ parameters.imageName }}" >> reports/build-report.txt
+    echo "Image Tag: ${{ parameters.imageTag }}" >> reports/build-report.txt
+    echo "Build Status: $(Build.Status)" >> reports/build-report.txt
+    echo "Build URL: $(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)" >> reports/build-report.txt
+  displayName: Generate Build Report
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Build Report
+  inputs:
+    pathToPublish: 'reports'
+    artifactName: 'build-report'
+    publishLocation: 'Container'
