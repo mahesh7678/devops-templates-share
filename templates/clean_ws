@@ -1,0 +1,6 @@
+steps:
+
+- script: |
+    echo "Cleaning up workspace..."
+    rm -rf *
+  displayName: Cleanup Workspace
