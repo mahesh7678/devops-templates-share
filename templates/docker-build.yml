@@ -1,0 +1,16 @@
+parameters:
+  imageName: ''
+  imageTag: 'latest'
+  dockerfile: 'Dockerfile'
+  buildContext: '.'
+
+steps:
+
+- script: |
+    echo "Building Docker image: ${{ parameters.imageName }}:${{ parameters.imageTag }}"
+    docker build \
+      -t ${{ parameters.imageName }}:${{ parameters.imageTag }} \
+      -t ${{ parameters.imageName }}:latest \
+      -f ${{ parameters.dockerfile }} \
+      ${{ parameters.buildContext }}
+  displayName: Build Docker Image
